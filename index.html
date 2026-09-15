@@ -115,13 +115,15 @@
 
   /* ---------- radio player ---------- */
   .radio-intro{color:var(--muted);font-size:14.5px;max-width:60ch;margin:0 0 30px}
-  .deck{display:flex;align-items:center;gap:18px;border:1px solid var(--line);background:var(--bg-2);padding:26px 30px;flex-wrap:wrap}
+  .deck{display:flex;align-items:center;gap:20px;border:1px solid var(--line);background:var(--bg-2);padding:26px 30px;flex-wrap:wrap}
   .play-btn{width:54px;height:54px;border-radius:50%;background:var(--red);border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s}
   .play-btn:hover{background:var(--red-bright)}
   .play-btn i{display:block;width:0;height:0;border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
   .play-btn i.pause{display:flex;align-items:center;justify-content:center;gap:4px;width:auto;height:16px;border:0;background:none;margin-left:0}
   .play-btn i.pause span{display:block;width:4px;height:16px;background:#fff}
-  .deck-time{font-size:13px;color:var(--muted);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  .wave-wrap{flex:1;min-width:140px;height:56px;position:relative;cursor:pointer}
+  .wave-wrap canvas{width:100%;height:100%;display:block}
+  .deck-time{font-size:13px;color:var(--muted);letter-spacing:.04em;font-variant-numeric:tabular-nums;flex-shrink:0}
   .tracklist{list-style:none;margin:24px 0 0;padding:0;border:1px solid var(--line)}
   .tracklist li{display:flex;align-items:center;padding:14px 20px;border-top:1px solid var(--line);cursor:pointer;font-size:14px;letter-spacing:.02em;color:#D6D5D2;transition:.15s}
   .tracklist li:first-child{border-top:0}
@@ -321,19 +323,19 @@
       <h2>Radio IsitSeif</h2><div class="rule"></div><span class="count">Genre Reel</span>
     </div>
     <p class="radio-intro">
-      Five genres on one tape — a two-minute run through the styles I produce in,
-      cassette changes and all.
+      Five genres on one tape — a two-minute run through some of the styles I produce.
     </p>
     <div class="deck">
       <button class="play-btn" id="radioPlay" aria-label="Play"><i></i></button>
+      <div class="wave-wrap" id="waveWrap"><canvas id="waveform"></canvas></div>
       <div class="deck-time"><span id="radioCur">0:00</span> / <span id="radioDur">2:03</span></div>
     </div>
     <ol class="tracklist" id="tracklist">
-      <li data-start="7"><span class="idx">01</span> House / UK Garage</li>
-      <li data-start="30"><span class="idx">02</span> Jerk Trap</li>
-      <li data-start="52"><span class="idx">03</span> Afrobeats</li>
-      <li data-start="74"><span class="idx">04</span> Hip-Hop</li>
-      <li data-start="97"><span class="idx">05</span> Modern Sharqi</li>
+      <li data-start="7"><span class="idx">01</span> Modern Sharqi</li>
+      <li data-start="30"><span class="idx">02</span> House / UK Garage</li>
+      <li data-start="52"><span class="idx">03</span> Jerk Trap</li>
+      <li data-start="74"><span class="idx">04</span> Afrobeats</li>
+      <li data-start="97"><span class="idx">05</span> Hip-Hop</li>
     </ol>
     <audio id="radioAudio" src="radio-isitseif.mp3" preload="none"></audio>
   </div>
@@ -505,18 +507,56 @@
     });
   });
 
+  var WAVE_PEAKS = [0.1166,0.0227,0.0034,0.0046,0.0059,0.5568,0.3797,0.338,0.2445,0.3423,0.2389,0.0132,0.6125,0.4258,0.3534,0.1111,0.3376,0.2419,0.3173,0.1875,0.0487,0.2031,0.027,0.0349,0.2371,0.0321,0.011,0.0025,0.146,0.3483,0.3778,0.1136,0.8128,0.8944,0.4824,0.3809,0.1019,0.7693,0.2894,0.1415,0.8188,0.8668,0.7857,0.8469,0.8536,0.8586,0.3305,0.1504,0.8022,0.904,0.7668,0.3377,0.2838,0.7858,0.2776,0.129,0.8217,0.8982,0.8017,0.5265,0.2408,0.7293,0.3647,0.2829,0.7652,0.8293,0.892,0.1922,0.3372,0.7638,0.3178,0.266,0.1496,0.8058,0.8899,0.1909,0.5318,0.7843,0.5129,0.3306,0.1219,0.8104,0.9045,0.2958,0.3597,0.7872,0.673,0.2548,0.1284,0.8145,0.8947,0.2084,0.4765,0.7929,0.6198,0.3695,0.1804,0.8338,0.9066,0.3736,0.4106,0.7624,0.7471,0.3081,0.1429,0.8076,0.1039,0.1866,0.1505,0.1705,0.2578,0.1487,0.0164,0.239,0.1111,0.0211,0.0117,0.0024,0.1458,0.0499,0.4755,0.5214,0.9205,0.4426,0.4825,0.492,0.7065,0.4753,0.4571,0.4764,0.8845,0.4561,0.6396,0.4877,0.6923,0.1117,0.5062,0.502,0.72,0.5047,0.4583,0.487,0.6627,0.4838,0.5164,0.5053,0.8253,0.4956,0.6856,0.4977,0.8526,0.4931,0.9286,0.7177,0.8263,0.4985,0.5444,0.9222,0.7589,0.462,0.9315,0.709,0.9105,0.5054,0.7143,0.9256,0.8139,0.8268,0.9322,0.6644,0.7906,0.8696,0.9239,0.9258,0.6783,0.4863,0.9249,0.7021,0.8701,0.5106,0.8346,0.9286,0.7723,0.9211,0.9301,0.5823,0.8322,0.5003,0.5172,0.9237,0.662,0.47,0.9315,0.5586,0.7832,0.6337,0.5286,0.9272,0.6667,0.1058,0.1491,0.0271,0.0349,0.243,0.0326,0.0027,0.0128,0.0025,0.1461,0.0985,0.8655,0.8622,0.8239,0.9014,0.7787,0.6575,0.4411,0.2561,0.167,0.1837,0.1338,0.1985,0.17,0.7971,0.8071,0.7599,0.8767,0.8125,0.75,0.6237,0.4445,0.3347,0.2398,0.1731,0.1977,0.1439,0.2104,0.7645,0.6981,0.9136,0.7502,0.7112,0.6824,0.6089,0.8235,0.7238,0.626,0.5494,0.5838,0.7621,0.7719,0.7259,0.877,0.778,0.8443,0.7757,0.4432,0.3329,0.2797,0.164,0.9074,0.875,0.8602,0.826,0.8308,0.8074,0.8181,0.676,0.6698,0.3318,0.2608,0.1496,0.2382,0.8363,0.8681,0.8298,0.8153,0.7994,0.8398,0.8014,0.8524,0.8148,0.4622,0.3431,0.3795,0.2501,0.3149,0.4334,0.378,0.9292,0.8838,0.1446,0.0268,0.0726,0.2388,0.0323,0.0116,0.0024,0.1461,0.0499,0.1195,0.2432,0.235,0.1527,0.1623,0.1052,0.0949,0.0966,0.0884,0.0628,0.0978,0.0885,0.0787,0.1373,0.145,0.1298,0.1109,0.2829,0.2959,0.2288,0.1457,0.1371,0.1005,0.0949,0.0808,0.0905,0.0475,0.0794,0.0365,0.0763,0.2929,0.3099,0.2402,0.9171,0.9183,0.4317,0.7412,0.2568,0.1509,0.0872,0.3771,0.192,0.545,0.6937,0.7641,0.3022,0.2346,0.3405,0.7755,0.3253,0.641,0.928,0.3435,0.819,0.2187,0.1364,0.1124,0.3199,0.2112,0.7575,0.5929,0.8345,0.2045,0.7801,0.8676,0.8814,0.7862,0.9143,0.8479,0.5207,0.7329,0.2607,0.1212,0.1116,0.3589,0.572,0.6878,0.4136,0.7697,0.1844,0.2581,0.3409,0.0272,0.0172,0.2401,0.0322,0.0052,0.0115,0.0028,0.1463,0.0064,0.9297,0.8892,0.9054,0.7658,0.718,0.9331,0.8783,0.9266,0.9261,0.9282,0.7696,0.4779,0.7133,0.5221,0.1528,0.1254,0.9304,0.8786,0.7402,0.7743,0.781,0.614,0.1608,0.5779,0.8414,0.9279,0.7466,0.6181,0.8115,0.6888,0.1163,0.1696,0.2081,0.9326,0.2685,0.8401,0.8505,0.8349,0.5833,0.5108,0.8868,0.9294,0.6873,0.7161,0.6578,0.8645,0.1907,0.1154,0.1536,0.9278,0.3269,0.7351,0.6404,0.8535,0.6696,0.5312,0.9176,0.9175,0.7274,0.523,0.5773,0.8116,0.1205,0.1219,0.1817,0.9302,0.5561,0.8867,0.683,0.8686,0.9273,0.7019,0.925,0.9246,0.7668,0.56,0.4427,0.7149,0.1531,0.1213,0.123,0.9281,0.2825,0.7727,0.5957,0.2872,0.0269,0.0352,0.2403,0.032,0.0022,0.0024,0.0027,0.0026,0.003,0.0065,0.0757,0.0314,0.0278,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0];
+
   (function(){
     var audio = document.getElementById('radioAudio');
     var btn = document.getElementById('radioPlay');
     var cur = document.getElementById('radioCur');
     var dur = document.getElementById('radioDur');
     var items = document.querySelectorAll('#tracklist li');
-    if(!audio) return;
+    var waveWrap = document.getElementById('waveWrap');
+    var canvas = document.getElementById('waveform');
+    if(!audio || !canvas) return;
+    var ctx = canvas.getContext('2d');
+    var dpr = window.devicePixelRatio || 1;
+    var knownDuration = 123.507;
+
     function fmt(s){ s = Math.max(0, Math.floor(s)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+
+    function sizeCanvas(){
+      var w = waveWrap.clientWidth, h = waveWrap.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawWave();
+    }
+
+    function drawWave(){
+      var w = waveWrap.clientWidth, h = waveWrap.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+      var n = WAVE_PEAKS.length;
+      var barW = w / n;
+      var gap = Math.max(0.6, barW * 0.32);
+      var d = audio.duration && isFinite(audio.duration) ? audio.duration : knownDuration;
+      var progress = d ? Math.min(1, audio.currentTime / d) : 0;
+      var playedCount = Math.floor(progress * n);
+      for(var i = 0; i < n; i++){
+        var amp = Math.max(WAVE_PEAKS[i], 0.03);
+        var barH = Math.max(2, amp * h);
+        var x = i * barW;
+        var y = (h - barH) / 2;
+        ctx.fillStyle = i <= playedCount ? '#E11D28' : '#3C3C42';
+        ctx.fillRect(x, y, Math.max(0.6, barW - gap), barH);
+      }
+      var cx = progress * w;
+      ctx.fillStyle = '#FF6B73';
+      ctx.fillRect(Math.min(w - 1.5, cx), 0, 1.5, h);
+    }
+
     btn.addEventListener('click', function(){
       if(audio.paused){ audio.play(); } else { audio.pause(); }
     });
-    audio.addEventListener('loadedmetadata', function(){ dur.textContent = fmt(audio.duration); });
+    audio.addEventListener('loadedmetadata', function(){ dur.textContent = fmt(audio.duration); drawWave(); });
     audio.addEventListener('play', function(){
       btn.classList.add('playing'); btn.innerHTML = '<i class="pause"><span></span><span></span></i>';
     });
@@ -527,6 +567,7 @@
     audio.addEventListener('ended', stopState);
     audio.addEventListener('timeupdate', function(){
       cur.textContent = fmt(audio.currentTime);
+      drawWave();
       var t = audio.currentTime, activeIdx = -1;
       items.forEach(function(li, idx){
         if(t >= parseFloat(li.getAttribute('data-start'))) activeIdx = idx;
@@ -539,6 +580,15 @@
         audio.play();
       });
     });
+    waveWrap.addEventListener('click', function(e){
+      var rect = waveWrap.getBoundingClientRect();
+      var frac = (e.clientX - rect.left) / rect.width;
+      var d = audio.duration && isFinite(audio.duration) ? audio.duration : knownDuration;
+      audio.currentTime = Math.max(0, Math.min(d, frac * d));
+      audio.play();
+    });
+    window.addEventListener('resize', sizeCanvas);
+    sizeCanvas();
   })();
 </script>
 
