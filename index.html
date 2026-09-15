@@ -113,24 +113,14 @@
   .t-link:hover{color:var(--fg);border-color:var(--red)}
   @media(max-width:760px){.track{grid-template-columns:1fr;gap:16px}}
 
-  /* ---------- radio deck ---------- */
+  /* ---------- radio player ---------- */
   .radio-intro{color:var(--muted);font-size:14.5px;max-width:60ch;margin:0 0 30px}
-  .deck{display:flex;align-items:center;gap:28px;border:1px solid var(--line);background:var(--bg-2);padding:26px 30px;flex-wrap:wrap}
-  .deck-visual{display:flex;align-items:center;gap:22px;padding:16px 26px;background:#050506;border:1px solid var(--line);position:relative}
-  .deck-visual::before{content:"";position:absolute;left:50%;top:50%;width:56%;height:1px;background:var(--line);transform:translate(-50%,-50%);z-index:0}
-  .reel{
-    width:46px;height:46px;border-radius:50%;position:relative;z-index:1;
-    background:conic-gradient(var(--muted) 0 8deg,transparent 8deg 90deg,var(--muted) 90deg 98deg,transparent 98deg 180deg,var(--muted) 180deg 188deg,transparent 188deg 270deg,var(--muted) 270deg 278deg,transparent 278deg 360deg);
-    border:2px solid var(--line);
-  }
-  .reel::after{content:"";position:absolute;inset:34%;border-radius:50%;background:var(--bg-2);border:1px solid var(--line)}
-  .reel.spin{animation:reelspin 2.1s linear infinite}
-  @keyframes reelspin{to{transform:rotate(360deg)}}
-  .deck-controls{display:flex;align-items:center;gap:16px}
+  .deck{display:flex;align-items:center;gap:18px;border:1px solid var(--line);background:var(--bg-2);padding:26px 30px;flex-wrap:wrap}
   .play-btn{width:54px;height:54px;border-radius:50%;background:var(--red);border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s}
   .play-btn:hover{background:var(--red-bright)}
   .play-btn i{display:block;width:0;height:0;border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
-  .play-btn i.pause{width:4px;height:16px;border:0;background:#fff;box-shadow:7px 0 0 #fff;margin-left:0}
+  .play-btn i.pause{display:flex;align-items:center;justify-content:center;gap:4px;width:auto;height:16px;border:0;background:none;margin-left:0}
+  .play-btn i.pause span{display:block;width:4px;height:16px;background:#fff}
   .deck-time{font-size:13px;color:var(--muted);letter-spacing:.04em;font-variant-numeric:tabular-nums}
   .tracklist{list-style:none;margin:24px 0 0;padding:0;border:1px solid var(--line)}
   .tracklist li{display:flex;align-items:center;padding:14px 20px;border-top:1px solid var(--line);cursor:pointer;font-size:14px;letter-spacing:.02em;color:#D6D5D2;transition:.15s}
@@ -335,14 +325,8 @@
       cassette changes and all.
     </p>
     <div class="deck">
-      <div class="deck-visual">
-        <div class="reel" id="reelL"></div>
-        <div class="reel" id="reelR"></div>
-      </div>
-      <div class="deck-controls">
-        <button class="play-btn" id="radioPlay" aria-label="Play"><i></i></button>
-        <div class="deck-time"><span id="radioCur">0:00</span> / <span id="radioDur">2:03</span></div>
-      </div>
+      <button class="play-btn" id="radioPlay" aria-label="Play"><i></i></button>
+      <div class="deck-time"><span id="radioCur">0:00</span> / <span id="radioDur">2:03</span></div>
     </div>
     <ol class="tracklist" id="tracklist">
       <li data-start="7"><span class="idx">01</span> House / UK Garage</li>
@@ -524,7 +508,6 @@
   (function(){
     var audio = document.getElementById('radioAudio');
     var btn = document.getElementById('radioPlay');
-    var reels = [document.getElementById('reelL'), document.getElementById('reelR')];
     var cur = document.getElementById('radioCur');
     var dur = document.getElementById('radioDur');
     var items = document.querySelectorAll('#tracklist li');
@@ -535,12 +518,10 @@
     });
     audio.addEventListener('loadedmetadata', function(){ dur.textContent = fmt(audio.duration); });
     audio.addEventListener('play', function(){
-      btn.classList.add('playing'); btn.innerHTML = '<i class="pause"></i>';
-      reels.forEach(function(r){ r.classList.add('spin'); });
+      btn.classList.add('playing'); btn.innerHTML = '<i class="pause"><span></span><span></span></i>';
     });
     function stopState(){
       btn.classList.remove('playing'); btn.innerHTML = '<i></i>';
-      reels.forEach(function(r){ r.classList.remove('spin'); });
     }
     audio.addEventListener('pause', stopState);
     audio.addEventListener('ended', stopState);
